@@ -151,10 +151,12 @@ RUN set -ex; \
     chmod +x /usr/src/nextcloud/occ; \
     \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $fetchDeps; \
-    apt-get dist-clean
-
+    apt-get dist-clean;
+  
 COPY *.sh upgrade.exclude /
 COPY config/* /usr/src/nextcloud/config/
+
+USER www-data
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["php-fpm"]
