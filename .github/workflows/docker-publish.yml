@@ -12,6 +12,8 @@ on:
     branches: [ "develop" ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
+    paths:
+      - 'images/**/*'
   pull_request:
     branches: [ "develop" ]
 
