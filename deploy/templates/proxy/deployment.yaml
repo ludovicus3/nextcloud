@@ -1,0 +1,68 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ include "nextcloud.proxy.fullname" . }}
+  namespace: {{ include "common.names.namespace" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: proxy
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: proxy
+  template:
+    metadata:
+      labels:
+        {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: proxy
+    spec:
+      restartPolicy: Always
+      serviceAccountName: nextcloud
+      containers:
+        - name: nginx
+          image: {{ include "nextcloud.proxy.image" . }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - name: nextcloud
+              mountPath: /var/www/
+              subPath: root
+            - name: nextcloud
+              mountPath: /var/www/html
+              subPath: html
+            - name: data
+              mountPath: /var/www/html/data
+              subPath: data
+            - name: nextcloud
+              mountPath: /var/www/html/config
+              subPath: config
+            - name: nextcloud
+              mountPath: /var/www/html/custom_apps
+              subPath: custom_apps
+            - name: nextcloud
+              mountPath: /var/www/tmp
+              subPath: tmp
+            - name: nextcloud
+              mountPath: /var/www/html/themes
+              subPath: themes
+            - name: config
+              mountPath: /etc/nginx/conf.d/
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+      serviceAccount: nextcloud
+      volumes:
+        {{- include "nextcloud.volumes" . | nindent 8 }}
+        - name: config
+          configMap:
+            name: nextcloud-proxy
+      dnsPolicy: ClusterFirst
+  strategy:
+    type: Recreate
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

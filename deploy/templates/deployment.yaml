@@ -1,0 +1,46 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  namespace: {{ include "common.names.namespace" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: nextcloud
+spec:
+  {{- if not .Values.nextcloud.autoscaling.enabled }}
+  replicas: {{ .Values.nextcloud.replicaCount }}
+  {{- end }}
+  strategy:
+    {{- toYaml .Values.nextcloud.strategy | nindent 4 }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: nextcloud
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: nextcloud
+    spec:
+      restartPolicy: Always
+      serviceAccountName: {{ include "nextcloud.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ include "nextcloud.image" . }}
+          imagePullPolicy: IfNotPresent
+          env:
+            {{- include "nextcloud.env" . | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: 9000
+              protocol: TCP
+          volumeMounts:
+            {{- include "nextcloud.volumeMounts" . | nindent 12 }}
+      serviceAccount: nextcloud
+      volumes:
+        {{- include "nextcloud.volumes" . | nindent 8 }}
+
+

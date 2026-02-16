@@ -1,0 +1,23 @@
+apiVersion: v2
+name: nextcloud
+description: A Helm chart for Kubernetes
+icon: file://./logo_nextcloud_white.svg
+type: application
+version: 0.1.0
+appVersion: "31.0.7-fpm"
+dependencies:
+  - name: common
+    repository: oci://registry-1.docker.io/bitnamicharts
+    version: 2.31.4
+  - name: minio
+    repository: oci://registry-1.docker.io/bitnamicharts
+    version: 17.0.21
+    condition: minio.enabled
+  - name: postgresql
+    repository: oci://registry-1.docker.io/bitnamicharts
+    version: 18.2.3
+    condition: postgresql.enabled
+  - name: redis
+    repository: oci://registry-1.docker.io/bitnamicharts
+    version: 24.1.2
+    condition: redis.enabled

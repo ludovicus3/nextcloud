@@ -1,0 +1,45 @@
+kind: CronJob
+apiVersion: batch/v1
+metadata:
+  name: {{ printf "%s-cron" (include "common.names.fullname" .) }}
+  namespace: {{ include "common.names.namespace" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: "cron"
+  {{- with .Values.cronjob.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  schedule: {{ .Values.cronjob.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: {{ .Values.cronjob.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.cronjob.failedJobsHistoryLimit }}
+  jobTemplate:
+    metadata:
+      labels:
+        {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: "cron"
+    spec:
+      template:
+        spec:
+          {{- with .Values.nextcloud.image.pullSecrets }}
+          imagePullSecrets:
+            {{ toYaml . | nindent 12 }}
+          {{- end }}
+          restartPolicy: Never
+          serviceAccount: {{ include "nextcloud.fullname" . }}
+          securityContext:
+            {{- toYaml .Values.cronjob.securityContext | nindent 12 }}
+          containers:
+            - name: cron
+              image: {{ include "nextcloud.image" . }}
+              imagePullPolicy: {{ .Values.nextcloud.image.pullPolicy }}
+              command: 
+                {{- toYaml .Values.cronjob.command | nindent 16 }}
+              env:
+                {{- include "nextcloud.env" . | nindent 16 }}
+              volumeMounts:
+                {{- include "nextcloud.volumeMounts" . | nindent 16 }}
+          volumes:
+            {{- include "nextcloud.volumes" . | nindent 12 }}

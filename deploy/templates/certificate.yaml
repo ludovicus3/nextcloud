@@ -1,0 +1,21 @@
+{{- if and (.Capabilities.APIVersions.Has "cert-manager.io/v1") .Values.ingress.tls.create -}}
+kind: Certificate
+apiVersion: cert-manager.io/v1
+metadata:
+  name: {{ include "nextcloud.fullname" . }}
+  namespace: {{ include "common.names.namespace" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  dnsNames:
+    - {{ .Values.nextcloud.host }}
+  {{- with .Values.ingress.tls.issuer }}
+  issuerRef:
+    kind: {{ default "Issuer" .kind }}
+    {{- with .group }}
+    group: {{ . }}
+    {{- end }}
+    name: {{ required "Issuer is missing required name" .name }}
+  {{- end }}
+  secretName: {{ printf "%s-tls" (include "nextcloud.fullname" .) }}
+{{- end -}}
