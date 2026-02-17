@@ -3,6 +3,16 @@ ARG BASE_IMAGE_TAG=8.3-fpm-trixie
 FROM ${BASE_IMAGE}:${BASE_IMAGE_TAG}
 
 RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+      bzip2 \
+      rsync \
+      libmagickcore-7.q16-10-extra \
+      libldap-common \
+    ; \
+    apt-get dist-clean
+
+RUN set -eux; \
     \
     savedAptMark="$(apt-mark showmanual)"; \
     \
