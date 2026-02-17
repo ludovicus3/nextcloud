@@ -125,6 +125,7 @@ nextcloud:
   strategy:
     type: Recreate
   image:
+    registry: ghcr.io/ludovicus3
     repository: nextcloud
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
@@ -204,9 +205,7 @@ cronjob:
     - /var/www/html/cron.php
     - --
     - --verbose
-  securityContext:
-    runAsUser: 33
-    fsGroup: 33
+  securityContext: {}
 
 minio:
   enabled: false

@@ -39,8 +39,14 @@ spec:
               protocol: TCP
           volumeMounts:
             {{- include "nextcloud.volumeMounts" . | nindent 12 }}
+            - name: phpconfig
+              mountPath: /usr/local/etc/php/conf.d/redis-session.ini
+              subPath: redis-session.ini
       serviceAccount: nextcloud
       volumes:
         {{- include "nextcloud.volumes" . | nindent 8 }}
+        - name: phpconfig
+          configMap:
+            name: {{ printf "%s-phpconfig" (include "nextcloud.fullname" .) }}
 
 

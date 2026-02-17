@@ -1,7 +1,7 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ include "nextcloud.fullname" . }}
+  name: {{ printf "%s-phpconfig" (include "nextcloud.fullname" .) }}
   namespace: {{ include "common.names.namespace" . }}
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}

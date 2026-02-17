@@ -3,7 +3,11 @@
 {{- end -}}
 
 {{- define "nextcloud.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create -}}
 {{- default (include "nextcloud.fullname" .) .Values.serviceAccount.name -}}
+{{- else -}}
+{{- default "default" .Values.serviceAccount.create -}}
+{{- end -}}
 {{- end -}}
 
 {{- define "nextcloud.proxy.fullname" -}}
