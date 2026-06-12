@@ -1,6 +1,4 @@
-ARG BASE_IMAGE=php
-ARG BASE_IMAGE_TAG=8.3-fpm-trixie
-FROM ${BASE_IMAGE}:${BASE_IMAGE_TAG}
+FROM php:8.3-fpm-trixie
 
 RUN set -eux; \
     apt-get update; \
