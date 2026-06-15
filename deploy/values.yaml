@@ -187,7 +187,7 @@ proxy:
   containerPort: 8080
 
   image:
-    repository: nginx
+    repository: nginxinc/nginx-unprivileged
     registry: docker.io
     tag: stable
     digest:
