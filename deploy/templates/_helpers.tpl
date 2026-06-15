@@ -22,6 +22,10 @@
 {{- include "common.images.image" (dict "imageRoot" .Values.nextcloud.image "global" .Values.global "chart" .Chart) -}}
 {{- end -}}
 
+{{- define "nextcloud.imagePullPolicy" -}}
+{{- default "IfNotPresent" .Values.nextcloud.image.pullPolicy -}}
+{{- end -}}
+
 {{/*
 Get the password secret.
 */}}

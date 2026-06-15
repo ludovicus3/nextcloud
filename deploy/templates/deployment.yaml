@@ -30,7 +30,7 @@ spec:
       initContainers:
         - name: {{ printf "%s-init" .Chart.Name }}
           image: {{ include "nextcloud.image" . }}
-          imagePullPolicy: {{ default "IfNotPresent" .Values.nextcloud.image.pullPolicy }}
+          imagePullPolicy: {{ include "nextcloud.imagePullPolicy" . }}
           volumeMounts:
             {{- include "nextcloud.volumeMounts" . | nindent 12 }}
           command:
@@ -40,23 +40,20 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           image: {{ include "nextcloud.image" . }}
-          imagePullPolicy: {{ default "IfNotPresent" .Values.nextcloud.image.pullPolicy }}
+          imagePullPolicy: {{ include "nextcloud.imagePullPolicy" . }}
           env:
             {{- include "nextcloud.env" . | nindent 12 }}
           ports:
             - name: http
-              containerPort: 9000
+              containerPort: {{ .Values.nextcloud.containerPort }}
               protocol: TCP
           volumeMounts:
             {{- include "nextcloud.volumeMounts" . | nindent 12 }}
-          livenessProbe:
-            exec:
-              command:
-                - php
-                - /var/www/html/occ
-                - status
-              initialDelaySeconds: 5
-              periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.nextcloud.containerPort }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
       serviceAccount: nextcloud
       volumes:
         {{- include "nextcloud.volumes" . | nindent 8 }}

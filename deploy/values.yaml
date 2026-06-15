@@ -136,6 +136,7 @@ nextcloud:
   service:
     type: ClusterIP
     port: 9000
+  resources: {}
 
 persistence:
   enabled: true
@@ -206,9 +207,6 @@ cronjob:
     - --
     - --verbose
   securityContext: {}
-
-minio:
-  enabled: false
 
 postgresql:
   enabled: false
