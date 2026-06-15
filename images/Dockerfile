@@ -114,8 +114,8 @@ RUN set -eux; \
     \
     { \
       echo 'session.save_handler = redis'; \
-# REDIS_HOST_URL="tcp://${REDIS_HOST}:${REDIS_HOST_PORT:=6379}?auth[]=${REDIS_HOST_USER}&auth[]=${REDIS_HOST_PASSWORD}"
-      echo 'session.save_path = "tcp://${REDIS_HOST}:${REDIS_HOST_PORT:=6379}"'; \
+# REDIS_HOST_URL="tcp://${REDIS_HOST}:${REDIS_HOST_PORT:-6379}?auth[]=${REDIS_HOST_USER}&auth[]=${REDIS_HOST_PASSWORD}"
+      echo 'session.save_path = "tcp://${REDIS_HOST}:${REDIS_HOST_PORT:-6379}"'; \
       echo "redis.session.locking_enabled = 1"; \
       echo "redis.session.lock_retries = -1"; \
 # redis.session.lock_wait_time is specified in microseconds.
