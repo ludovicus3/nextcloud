@@ -27,10 +27,20 @@ spec:
       serviceAccountName: {{ include "nextcloud.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
+      initContainers:
+        - name: {{ printf "%s-init" .Chart.Name }}
+          image: {{ include "nextcloud.image" . }}
+          imagePullPolicy: {{ default "IfNotPresent" .Values.nextcloud.image.pullPolicy }}
+          volumeMounts:
+            {{- include "nextcloud.volumeMounts" . | nindent 12 }}
+          command:
+            - php
+            - /var/www/html/occ
+            - status
       containers:
         - name: {{ .Chart.Name }}
           image: {{ include "nextcloud.image" . }}
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: {{ default "IfNotPresent" .Values.nextcloud.image.pullPolicy }}
           env:
             {{- include "nextcloud.env" . | nindent 12 }}
           ports:
@@ -39,14 +49,17 @@ spec:
               protocol: TCP
           volumeMounts:
             {{- include "nextcloud.volumeMounts" . | nindent 12 }}
-            - name: phpconfig
-              mountPath: /usr/local/etc/php/conf.d/redis-session.ini
-              subPath: redis-session.ini
+          livenessProbe:
+            exec:
+              command:
+                - php
+                - /var/www/html/occ
+                - status
+              initialDelaySeconds: 5
+              periodSeconds: 5
       serviceAccount: nextcloud
       volumes:
         {{- include "nextcloud.volumes" . | nindent 8 }}
-        - name: phpconfig
-          configMap:
-            name: {{ printf "%s-phpconfig" (include "nextcloud.fullname" .) }}
+
 
 
