@@ -7,6 +7,7 @@ RUN set -eux; \
       rsync \
       libmagickcore-7.q16-10-extra \
       libldap-common \
+      libfcgi-bin \
     ; \
     apt-get dist-clean
 
