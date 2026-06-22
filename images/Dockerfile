@@ -127,11 +127,11 @@ RUN set -eux; \
     { \
       echo '[www]'; \
       echo 'pm.status_path = /status'; \
-      echo 'ping.path = /healthz'; \
+      echo 'ping.path = /ping'; \
       echo 'ping.response = OK'; \
-      echo 'access.suppress_path[] = /healthz'; \
+      echo 'access.suppress_path[] = /ping'; \
       echo 'access.suppress_path[] = /status'; \
-    } > /usr/local/etc/php-fpm.d/healthz.conf; \
+    } > /usr/local/etc/php-fpm.d/status.conf; \
     mkdir /var/www/data; \
     mkdir -p /docker-entrypoint-hooks.d/pre-installation \
              /docker-entrypoint-hooks.d/post-installation \
