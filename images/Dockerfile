@@ -126,9 +126,12 @@ RUN set -eux; \
     \
     { \
       echo '[www]'; \
+      echo 'pm.status_path = /status'; \
+      echo '#pm.status_listen = 127.0.0.1:9001'; \
       echo 'ping.path = /healthz'; \
-      echo 'ping.response = ok'; \
+      echo 'ping.response = OK'; \
       echo 'access.suppress_path[] = /healthz'; \
+      echo 'access.suppress_path[] = /status'; \
     } > /usr/local/etc/php-fpm.d/healthz.conf; \
     mkdir /var/www/data; \
     mkdir -p /docker-entrypoint-hooks.d/pre-installation \
