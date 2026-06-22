@@ -17,6 +17,8 @@ spec:
       labels:
         {{- include "common.labels.standard" . | nindent 8 }}
         app.kubernetes.io/component: proxy
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/proxy/configmap.yaml") . | sha256sum }}
     spec:
       restartPolicy: Always
       serviceAccountName: nextcloud
