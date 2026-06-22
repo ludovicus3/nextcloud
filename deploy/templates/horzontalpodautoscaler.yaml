@@ -1,6 +1,6 @@
 {{- if .Values.nextcloud.autoscaling.enabled -}}
 kind: HorizontalPodAutoscaler
-apiVersion: autoscaling/v1
+apiVersion: autoscaling/v2
 metadata:
   name: {{ include "common.names.fullname" . }}
   namespace: {{ include "common.names.namespace" . }}
@@ -15,6 +15,12 @@ spec:
   {{- with .Values.nextcloud.autoscaling }}
   minReplicas: {{ .minReplicas }}
   maxReplicas: {{ .maxReplicas }}
-  targetCPUUtilizationPercentage: {{ .targetCPUUtilizationPercentage }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .targetCPUUtilizationPercentage }}
   {{- end }}
 {{- end -}}
