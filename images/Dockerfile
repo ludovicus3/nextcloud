@@ -123,6 +123,12 @@ RUN set -eux; \
       echo "redis.session.lock_wait_time = 10000"; \
     } > "${PHP_INI_DIR}/conf.d/redis-session.ini"; \
     \
+    { \
+      echo '[www]'; \
+      echo 'ping.path = /healthz'; \
+      echo 'ping.response = ok'; \
+      echo 'access.suppress_path[] = /healthz'; \
+    } > /usr/local/etc/php-fpm.d/healthz.conf; \
     mkdir /var/www/data; \
     mkdir -p /docker-entrypoint-hooks.d/pre-installation \
              /docker-entrypoint-hooks.d/post-installation \
