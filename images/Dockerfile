@@ -127,7 +127,6 @@ RUN set -eux; \
     { \
       echo '[www]'; \
       echo 'pm.status_path = /status'; \
-      echo '#pm.status_listen = 127.0.0.1:9001'; \
       echo 'ping.path = /healthz'; \
       echo 'ping.response = OK'; \
       echo 'access.suppress_path[] = /healthz'; \
