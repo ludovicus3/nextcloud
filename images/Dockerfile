@@ -85,9 +85,9 @@ RUN set -eux; \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
     apt-get dist-clean
 
-ENV PHP_MEMORY_LIMIT 512M
-ENV PHP_UPLOAD_LIMIT 512M
-ENV PHP_OPCACHE_MEMORY_CONSUMPTION 128
+ENV PHP_MEMORY_LIMIT=512M
+ENV PHP_UPLOAD_LIMIT=512M
+ENV PHP_OPCACHE_MEMORY_CONSUMPTION=128
 RUN set -eux; \
     { \
       echo 'opcache.enable=1'; \
@@ -141,7 +141,7 @@ RUN set -eux; \
 
 VOLUME /var/www/html
 
-ENV NEXTCLOUD_VERSION 33.0.5
+ENV NEXTCLOUD_VERSION=33.0.5
 
 RUN set -ex; \
     fetchDeps=" \
