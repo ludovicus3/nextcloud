@@ -27,33 +27,20 @@ spec:
           image: {{ include "nextcloud.proxy.image" . }}
           ports:
             - name: http
-              containerPort: 8080
+              containerPort: {{ .Values.proxy.containerPort }}
+              protocol: TCP
+            - name: https
+              containerPort: {{ .Values.proxy.sslContainerPort }}
               protocol: TCP
           resources: {}
           volumeMounts:
-            - name: nextcloud
-              mountPath: /var/www/
-              subPath: root
-            - name: nextcloud
-              mountPath: /var/www/html
-              subPath: html
-            - name: data
-              mountPath: /var/www/html/data
-              subPath: data
-            - name: nextcloud
-              mountPath: /var/www/html/config
-              subPath: config
-            - name: nextcloud
-              mountPath: /var/www/html/custom_apps
-              subPath: custom_apps
-            - name: nextcloud
-              mountPath: /var/www/tmp
-              subPath: tmp
-            - name: nextcloud
-              mountPath: /var/www/html/themes
-              subPath: themes
+            {{- include "nextcloud.volumeMounts" . | nindent 12 }}
             - name: config
               mountPath: /etc/nginx/conf.d/
+            {{- if .Values.proxy.ssl.enabled }}
+            - name: tls
+              mountPath: {{ include "nextcloud.tls.mountPath" . }}
+            {{- end }}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           imagePullPolicy: IfNotPresent
@@ -63,6 +50,11 @@ spec:
         - name: config
           configMap:
             name: nextcloud-proxy
+        {{- if .Values.proxy.ssl.enabled }}
+        - name: tls
+          secret:
+            secretName: {{ include "nextcloud.tls.secretName" . }}
+        {{- end }}
       dnsPolicy: ClusterFirst
   strategy:
     type: Recreate

@@ -1,7 +1,7 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: {{ include "nextcloud.fpm.fullname" . }}
   namespace: {{ include "common.names.namespace" . }}
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
@@ -28,13 +28,13 @@ spec:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   ports:
-    - name: http
+    - name: fcgi
       protocol: TCP
       port: {{ .Values.nextcloud.service.port }}
-      targetPort: http
+      targetPort: fcgi
       {{- with .Values.nextcloud.service.nodePort }}
       nodePort: {{ . }}
       {{- end }}
   selector:
     {{- include "common.labels.matchLabels" . | nindent 4 }}
-    app.kubernetes.io/component: nextcloud
+    app.kubernetes.io/component: fpm

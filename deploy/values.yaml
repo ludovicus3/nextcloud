@@ -44,14 +44,6 @@ ingress:
     # kubernetes.io/tls-acme: "true"
   path: /
   pathType: Prefix
-  tls:
-    enabled: false
-    create: false
-    existingSecret:
-    issuer:
-      kind:
-      group: ""
-      name:
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -119,11 +111,12 @@ nextcloud:
   autoscaling:
     enabled: false
     minReplicas: 1
-    maxReplicas: 100
-    targetCPUUtilizationPercentage: 80
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
   replicaCount: 1
   strategy:
     type: Recreate
+  host:
   image:
     registry: ghcr.io/ludovicus3
     repository: nextcloud
@@ -137,6 +130,15 @@ nextcloud:
     type: ClusterIP
     port: 9000
   resources: {}
+
+tls:
+  create: false
+  existingSecret:
+  issuer:
+    kind:
+    group: ""
+  mountPath:
+
 
 persistence:
   enabled: true
@@ -184,8 +186,13 @@ proxy:
   replicaCount: 1
 
   trustedIPs:
-  ipFamilies: []
+  ipFamilies:
+    - IPv4
+    - IPv6
   containerPort: 8080
+  sslContainerPort: 8443
+  ssl:
+    enabled: true
 
   image:
     repository: nginxinc/nginx-unprivileged
@@ -195,6 +202,7 @@ proxy:
 
   service:
     port: 80
+    sslPort: 443
 
 cronjob:
   schedule: "*/5 * * * *"
