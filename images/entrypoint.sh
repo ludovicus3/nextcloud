@@ -1,6 +1,11 @@
 #!/bin/sh
 set -eu
 
+if [ -n "${REDIS_HOST_PASSWORD-}" ]; then
+  REDIS_AUTH="auth=${REDIS_HOST_PASSWORD}"
+fi
+export REDIS_HOST_URL="tcp://${REDIS_HOST}:${REDIS_HOST_PORT:-6379}${REDIS_AUTH-}"
+
 # version_greater A B returns whether A > B
 version_greater() {
   [ "$(printf '%s\n' "$@" | sort -t '.' -n -k1,1 -k2,2 -k3,3 -k4,4 | head -n 1)" != "$1" ]
