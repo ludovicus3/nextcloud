@@ -88,56 +88,9 @@ RUN set -eux; \
 ENV PHP_MEMORY_LIMIT=512M
 ENV PHP_UPLOAD_LIMIT=512M
 ENV PHP_OPCACHE_MEMORY_CONSUMPTION=128
+COPY nextcloud.ini ${PHP_INI_DIR}/conf.d/
+COPY php-fpm.conf /usr/local/etc/
 RUN set -eux; \
-    { \
-      echo 'opcache.enable=1'; \
-      echo 'opcache.interned_strings_buffer=32'; \
-      echo 'opcache.max_accelerated_files=10000'; \
-      echo 'opcache.memory_consumption=${PHP_OPCACHE_MEMORY_CONSUMPTION}'; \
-      echo 'opcache.save_comments=1'; \
-      echo 'opcache.revalidate_freq=60'; \
-      echo 'opcache.jit=1255'; \
-      echo 'opcache.jit_buffer_size=8M'; \
-    } > "${PHP_INI_DIR}/conf.d/opcache-recommended.ini"; \
-    \
-    echo 'apc.enable_cli=1' >> "${PHP_INI_DIR}/conf.d/docker-php-ext-apcu.ini"; \
-    \
-    { \
-      echo 'apc.serializer=igbinary'; \
-      echo 'session.serialize_handler=igbinary'; \
-    } >> "${PHP_INI_DIR}/conf.d/docker-php-ext-igbinary.ini"; \
-    \
-    { \
-      echo 'memory_limit=${PHP_MEMORY_LIMIT}'; \
-      echo 'upload_max_filesize=${PHP_UPLOAD_LIMIT}'; \
-      echo 'post_max_size=${PHP_UPLOAD_LIMIT}'; \
-    } > "${PHP_INI_DIR}/conf.d/nextcloud.ini"; \
-    \
-    { \
-      echo 'session.save_handler = redis'; \
-# REDIS_HOST_URL="tcp://${REDIS_HOST}:${REDIS_HOST_PORT:-6379}?auth[]=${REDIS_HOST_USER}&auth[]=${REDIS_HOST_PASSWORD}"
-      echo 'session.save_path = "tcp://${REDIS_HOST}:${REDIS_HOST_PORT:-6379}"'; \
-      echo "redis.session.locking_enabled = 1"; \
-      echo "redis.session.lock_retries = -1"; \
-# redis.session.lock_wait_time is specified in microseconds.
-# Wait 10ms before retrying the lock rather than the default 2ms.
-      echo "redis.session.lock_wait_time = 10000"; \
-    } > "${PHP_INI_DIR}/conf.d/redis-session.ini"; \
-    \
-    { \
-      echo '[www]'; \
-      echo 'pm.status_path = /status'; \
-      echo 'ping.path = /ping'; \
-      echo 'ping.response = OK'; \
-      echo 'access.suppress_path[] = /ping'; \
-      echo 'access.suppress_path[] = /status'; \
-    } > /usr/local/etc/php-fpm.d/status.conf; \
-    mkdir /var/www/data; \
-    mkdir -p /docker-entrypoint-hooks.d/pre-installation \
-             /docker-entrypoint-hooks.d/post-installation \
-             /docker-entrypoint-hooks.d/pre-upgrade \
-             /docker-entrypoint-hooks.d/post-upgrade \
-             /docker-entrypoint-hooks.d/before-starting; \
     chown -R www-data:root /var/www; \
     chmod -R g=u /var/www
 

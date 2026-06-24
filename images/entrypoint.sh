@@ -11,46 +11,6 @@ directory_empty() {
   [ -z "$(ls -A "$1/")" ]
 }
 
-# Execute all executable files in a given directory in alphanumeric order
-run_path() {
-  local hook_folder_path="/docker-entrypoint-hooks.d/$1"
-  local return_code=0
-  local found=0
-
-  echo "=> Searching for hook scripts (*.sh) to run, located in the folder \"${hook_folder_path}\""
-
-  if ! [ -d "${hook_folder_path}" ] || directory_empty "${hook_folder_path}"; then
-    echo "==> Skipped: the \"$1\" folder is empty (or does not exist)"
-    return 0
-  fi
-
-  find "${hook_folder_path}" -maxdepth 1 -iname '*.sh' '(' -type f -o -type l ')' -print | sort | (
-    while read -r script_file_path; do
-      if ! [ -x "${script_file_path}" ]; then
-        echo "==> The script \"${script_file_path}\" was skipped, because it lacks the executable flag"
-        found=$((found-1))
-        continue
-      fi
-
-      echo "==> Running the script (cwd: $(pwd)): \"${script_file_path}\""
-      found=$((found+1))
-      /bin/sh -c "${script_file_path}" || return_code="$?"
-
-      if [ "${return_code}" -ne "0" ]; then
-        echo "==> Failed at executing script \"${script_file_path}\". Exit code: ${return_code}"
-        exit 1
-      fi
-
-      echo "==> Finished executing the script: \"${script_file_path}\""
-    done
-    if [ "$found" -lt "1" ]; then
-      echo "==> Skipped: the \"$1\" folder does not contain any valid scripts"
-    else
-      echo "=> Completed executing scripts in the \"$1\" folder"
-    fi
-  )
-}
-
 # If another process is syncing the html folder, wait for
 # it to be done, then escape initalization.
 (
@@ -113,8 +73,6 @@ run_path() {
         install=true
 
         if [ "$install" = true ]; then
-          run_path pre-installation
-
           echo "Starting nextcloud installation"
           max_retries=10
           try=0
@@ -139,8 +97,6 @@ run_path() {
             done
             set +f # turn glob back on
           fi
-
-          run_path post-installation
         fi
       fi
       
@@ -151,16 +107,12 @@ run_path() {
       fi
     # Upgrade
     else
-      run_path pre-upgrade
-
       php /var/www/html/occ upgrade
 
       php /var/www/html/occ app:list | sed -n "/Enabled:/,/Disabled:/p" > /tmp/list_after
       echo "The following apps have been disabled:"
       diff /tmp/list_before /tmp/list_after | grep '<' | cut -d- -f2 | cut -d: -f1
       rm -f /tmp/list_before /tmp/list_after
-
-      run_path post-upgrade
     fi
 
     echo "Initializing finished"
@@ -182,7 +134,5 @@ for cfgPath in /usr/src/nextcloud/config/*.php; do
     fi
   fi
 done
-
-run_path before-starting
 
 exec "$@"
