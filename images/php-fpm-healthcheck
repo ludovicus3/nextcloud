@@ -1,0 +1,11 @@
+#!/bin/sh
+
+export REQUEST_METHOD=GET
+export SCRIPT_NAME=/ping
+export SCRIPT_FILENAME=/ping
+
+RESPONSE=$(cgi-fcgi -bind -connect localhost:${LISTEN_PORT:-9000} 2>/dev/null | tail -n 1)
+
+if [ "$RESPONSE" != "OK" ]; then
+  exit 1
+fi
