@@ -9,3 +9,5 @@ RESPONSE=$(cgi-fcgi -bind -connect localhost:${LISTEN_PORT:-9000} 2>/dev/null | 
 if [ "$RESPONSE" != "OK" ]; then
   exit 1
 fi
+
+echo "$RESPONSE"
