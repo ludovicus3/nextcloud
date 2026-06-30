@@ -45,29 +45,7 @@ ingress:
   path: /
   pathType: Prefix
 
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
 
-livenessProbe:
-  httpGet:
-    path: /
-    port: http
-readinessProbe:
-  httpGet:
-    path: /
-    port: http
-
-
-  # targetMemoryUtilizationPercentage: 80
 
 # Additional volumes on the output Deployment definition.
 volumes: []
@@ -131,15 +109,6 @@ nextcloud:
     port: 9000
   resources: {}
 
-tls:
-  create: false
-  existingSecret:
-  issuer:
-    kind:
-    group: ""
-  mountPath:
-
-
 persistence:
   enabled: true
   annotations: {}
@@ -183,16 +152,21 @@ proxy:
       client_body_timeout 300s;
       fastcgi_buffers 64 4K;
       fastcgi_read_timeout 3600s;
+  http2:
+    enabled: false
+  tls:
+    enabled: true
+    create: false
+    existingSecret:
+    mountPath:
+    issuer:
+      kind:
+      group: ""
   replicaCount: 1
-
   trustedIPs:
   ipFamilies:
     - IPv4
     - IPv6
-  containerPort: 8080
-  sslContainerPort: 8443
-  ssl:
-    enabled: true
 
   image:
     repository: nginxinc/nginx-unprivileged

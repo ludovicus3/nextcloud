@@ -28,7 +28,7 @@ spec:
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
       initContainers:
-        - name: {{ printf "%s-init" .Chart.Name }}
+        - name: init
           image: {{ include "nextcloud.image" . }}
           imagePullPolicy: {{ include "nextcloud.imagePullPolicy" . }}
           volumeMounts:
@@ -38,7 +38,7 @@ spec:
             - /var/www/html/occ
             - status
       containers:
-        - name: {{ .Chart.Name }}
+        - name: php-fpm
           image: {{ include "nextcloud.image" . }}
           imagePullPolicy: {{ include "nextcloud.imagePullPolicy" . }}
           env:
@@ -54,26 +54,65 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           livenessProbe:
+            tcpSocket:
+              port: fcgi
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          readinessProbe:
             exec:
               command:
                 - /bin/sh
                 - -c
-                - |
-                  export REQUEST_METHOD="GET"
-                  export SCRIPT_FILENAME=/ping
-                  export SCRIPT_NAME=/ping
-
-                  RESPONSE=$(cgi-fcgi -bind -connect localhost:{{ .Values.nextcloud.containerPort }} 2>/dev/null | tail -n 1)
-
-                  if [ "$RESPONSE" != "OK" ]; then
-                    exit 1
-                  fi
+                - php-fpm-healthcheck
+            initialDelaySeconds: 10
+            periodSeconds: 5
+{{/*
+        - name: metrics
+          image: 'hipages/php-fpm_exporter:latest'
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PHP_FPM_FIX_PROCESS_COUNT
+              value: 'true'
+          ports:
+            - name: metrics
+              containerPort: 9253
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 40m
+              memory: 32Mi
+            requests:
+              cpu: 40m
+              memory: 32Mi
           readinessProbe:
-            tcpSocket:
-              port: {{ .Values.nextcloud.containerPort }}
-            initialDelaySeconds: 5
-            periodSeconds: 10
-      serviceAccount: nextcloud
+            httpGet:
+              path: /metrics
+              port: metrics
+              scheme: HTTP
+            timeoutSeconds: 1
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+              scheme: HTTP
+            timeoutSeconds: 1
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+              scheme: HTTP
+            timeoutSeconds: 1
+            periodSeconds: 1
+            successThreshold: 1
+            failureThreshold: 120
+*/}}
+      serviceAccount: {{ include "nextcloud.serviceAccountName" . }}
       volumes:
         {{- include "nextcloud.volumes" . | nindent 8 }}
 

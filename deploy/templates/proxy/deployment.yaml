@@ -25,32 +25,32 @@ spec:
       containers:
         - name: nginx
           image: {{ include "nextcloud.proxy.image" . }}
+          imagePullPolicy: IfNotPresent
           ports:
             - name: http
-              containerPort: {{ .Values.proxy.containerPort }}
+              containerPort: 8080
               protocol: TCP
+            {{- if .Values.proxy.tls.enabled }}
             - name: https
-              containerPort: {{ .Values.proxy.sslContainerPort }}
+              containerPort: 8443
               protocol: TCP
+            {{- end }}
           resources: {}
           volumeMounts:
             {{- include "nextcloud.volumeMounts" . | nindent 12 }}
             - name: config
               mountPath: /etc/nginx/conf.d/
-            {{- if .Values.proxy.ssl.enabled }}
+            {{- if .Values.proxy.tls.enabled }}
             - name: tls
               mountPath: {{ include "nextcloud.tls.mountPath" . }}
             {{- end }}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          imagePullPolicy: IfNotPresent
       serviceAccount: nextcloud
       volumes:
         {{- include "nextcloud.volumes" . | nindent 8 }}
         - name: config
           configMap:
             name: nextcloud-proxy
-        {{- if .Values.proxy.ssl.enabled }}
+        {{- if .Values.proxy.tls.enabled }}
         - name: tls
           secret:
             secretName: {{ include "nextcloud.tls.secretName" . }}

@@ -1,4 +1,4 @@
-{{- if and (.Capabilities.APIVersions.Has "cert-manager.io/v1") .Values.tls.create -}}
+{{- if and (.Capabilities.APIVersions.Has "cert-manager.io/v1") .Values.proxy.tls.create -}}
 kind: Certificate
 apiVersion: cert-manager.io/v1
 metadata:
@@ -9,7 +9,7 @@ metadata:
 spec:
   dnsNames:
     - {{ .Values.nextcloud.host }}
-  {{- with .Values.tls.issuer }}
+  {{- with .Values.proxy.tls.issuer }}
   issuerRef:
     kind: {{ default "Issuer" .kind }}
     {{- with .group }}

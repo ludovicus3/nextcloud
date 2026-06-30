@@ -3,8 +3,8 @@ name: nextcloud
 description: A Helm chart for Kubernetes
 icon: file://./logo_nextcloud_white.svg
 type: application
-version: 0.1.1
-appVersion: "v33.0.5"
+version: 0.1.2
+appVersion: "v33.0.6"
 dependencies:
   - name: common
     repository: oci://registry-1.docker.io/bitnamicharts

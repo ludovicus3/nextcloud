@@ -82,6 +82,8 @@ Get the smtp-password key.
 {{- end -}}
 
 {{- define "nextcloud.env" -}}
+- name: LISTEN_PORT
+  value: {{ quote .Values.nextcloud.containerPort }}
 - name: NEXTCLOUD_ADMIN_USER
   valueFrom:
     secretKeyRef:
@@ -116,26 +118,6 @@ Get the smtp-password key.
 {{- if .Values.nextcloud.extraEnv }}
 {{ toYaml .Values.nextcloud.extraEnv }}
 {{- end }}
-{{- end -}}
-
-{{- define "nextcloud.tls.secretName" -}}
-{{- if and .Values.tls.create (.Capabilities.APIVersions.Has "cert-manager.io/v1") -}}
-{{-   printf "%s-tls" (include "nextcloud.fullname" .) -}}
-{{- else -}}
-{{-   .Values.tls.existingSecret -}}
-{{- end -}}
-{{- end -}}
-
-{{- define "nextcloud.tls.mountPath" -}}
-{{- default "/etc/ssl/nginx" .Values.tls.mountPath -}}
-{{- end -}}
-
-{{- define "nextcloud.tls.certificatePath" -}}
-{{- printf "%s/tls.crt" (include "nextcloud.tls.mountPath" .) -}}
-{{- end -}}
-
-{{- define "nextcloud.tls.certificateKeyPath" -}}
-{{- printf "%s/tls.key" (include "nextcloud.tls.mountPath" .) -}}
 {{- end -}}
 
 {{- define "nextcloud.fpm.fullname" -}}

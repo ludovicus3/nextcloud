@@ -31,10 +31,12 @@ spec:
       protocol: TCP
       port: {{ .Values.proxy.service.port }}
       targetPort: http
+    {{- if .Values.proxy.tls.enabled }}
     - name: https
       protocol: TCP
       port: {{ .Values.proxy.service.sslPort }}
       targetPort: https
+    {{- end }}
   selector:
     {{- include "common.labels.matchLabels" . | nindent 4 }}
     app.kubernetes.io/component: proxy
