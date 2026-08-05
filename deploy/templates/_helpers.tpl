@@ -110,6 +110,8 @@ Get the smtp-password key.
   value: https
 - name: OVERWRITEHOST
   value: {{ .Values.nextcloud.host }}
+- name: OVERWRITECLIURL
+  value: https://{{ .Values.nextcloud.host }}/
 - name: TRUSTED_PROXIES
   value: {{ .Values.proxy.trustedIPs }}
 {{- include "nextcloud.smtp.env" . }}

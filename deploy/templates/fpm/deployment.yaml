@@ -33,10 +33,12 @@ spec:
           imagePullPolicy: {{ include "nextcloud.imagePullPolicy" . }}
           volumeMounts:
             {{- include "nextcloud.volumeMounts" . | nindent 12 }}
-          command:
+          args:
             - php
             - /var/www/html/occ
             - status
+          env:
+            {{- include "nextcloud.env" . | nindent 12 }}
       containers:
         - name: php-fpm
           image: {{ include "nextcloud.image" . }}

@@ -137,6 +137,7 @@ proxy:
     minReplicas: 1
     maxReplicas: 100
     targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 75
   config:
     headers:
       Referrer-Policy: "no-referrer"
